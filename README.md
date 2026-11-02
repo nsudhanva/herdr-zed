@@ -2,7 +2,7 @@
 
 Open the current Herdr space in [Zed](https://zed.dev) from the tab bar.
 
-![The Herdr tab bar with the Zed button](preview.png)
+![The Herdr tab bar with the Zed button](docs/zed-button.png)
 
 ## Description
 
