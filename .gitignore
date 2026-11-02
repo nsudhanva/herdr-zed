@@ -1,0 +1,5 @@
+# Written by the Herdr app on every start.
+gpui-kit.d.ts
+jsconfig.json
+*.error
+.DS_Store
