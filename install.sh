@@ -6,7 +6,9 @@ set -euo pipefail
 readonly SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly HOME_DIR="${HERDR_APP_HOME:-$HOME/.config/herdr-app}"
 readonly LAYOUT="main-zed"
-readonly MODS=(zed-tabs zed-new-menu)
+readonly MODS=(zed-tabs)
+# Earlier versions added a Zed row to a copy of the + menu.
+readonly OLD_MODS=(zed-new-menu)
 
 force=false
 [[ "${1:-}" == "--force" ]] && force=true
@@ -26,14 +28,15 @@ if ! $force; then
 fi
 
 for mod in "${MODS[@]}"; do
-  rm -rf "$HOME_DIR/mods/$mod"
+  rm -rf "${HOME_DIR:?}/mods/$mod"
   cp -R "$SRC/mods/$mod" "$HOME_DIR/mods/$mod"
   herdr-app check "$HOME_DIR/mods/$mod"
 done
+for mod in "${OLD_MODS[@]}"; do rm -rf "${HOME_DIR:?}/mods/$mod"; done
 cp "$SRC/layouts/$LAYOUT.json" "$HOME_DIR/layouts/$LAYOUT.json"
 
 if herdr-app do layout.switch --name "$LAYOUT" >/dev/null 2>&1; then
-  echo "herdr-zed: installed. Click + in the tab bar, then click Zed."
+  echo "herdr-zed: installed. Click Zed in the tab bar."
 else
   echo "herdr-zed: installed. Open the Herdr app, then run: herdr-app do layout.switch --name $LAYOUT"
 fi

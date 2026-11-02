@@ -1,6 +1,7 @@
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings } from "herdr";
+import { openInZed } from "./zed.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -89,13 +90,29 @@ export default class Tabs extends View {
           else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
         }).child(svg(icon).size(14)).child(label);
     };
+    // Looks like a panel button, but opens the space in Zed (see zed.js) instead of a panel.
+    const zedButton = () => h_flex().id("open-zed").h(26).px(8).gap(5).flex_none().items_center().rounded(6)
+      .text_size(12).bg(t.chrome).text_color(this.zedOpening ? t.dim : t.muted)
+      .hover(s => s.bg(t.hover)).on_mouse_down("left", stop)
+      .on_click((_e, cx) => {
+        if (this.zedOpening || !space) return;
+        this.zedOpening = true;
+        cx.notify();
+        cx.spawn(async cx => {
+          await openInZed(space);
+          this.zedOpening = false;
+          cx.notify();
+        });
+      })
+      .child(svg("mods/zed-tabs/zed.svg").size(14)).child(this.zedOpening ? "Opening…" : "Zed");
     return h_flex().size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)
       .on_mouse_up("left", () => { this.pressed = null; })
       .on_scroll_wheel(e => { if (Math.abs(e.delta.y) >= 1) run(e.delta.y > 0 ? "tab.prev" : "tab.next"); })
       .child(h_flex().id("tab-scroll").flex_1().min_w(0).h_full().items_center().gap(3).overflow_x_scrollbar().children(shown.map(item)))
-      .child(button("tab-new", "+", () => openOverlay({ mod: "zed-new-menu", kind: "popup", width: 250, height: 543 })))
+      .child(button("tab-new", "+", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
+      .child(zedButton())
       .when(w?.buttons, el => el.child(button("minimize", w.platform === "windows" ? svg("mods/zed-tabs/win-min.svg").size(16) : "−", () => run("window.minimize")))
         .child(button("maximize", w.platform === "windows" ? svg(`mods/zed-tabs/${w.maximized ? "win-restore" : "win-max"}.svg`).size(16) : "□", () => run("window.maximize")))
         .child(button("close-window", w.platform === "windows" ? svg("mods/zed-tabs/win-close.svg").size(16) : svg("mods/pane/close.svg").size(13), () => run("window.close"))));

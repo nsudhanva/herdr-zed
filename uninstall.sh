@@ -9,5 +9,5 @@ if command -v herdr-app >/dev/null; then
 fi
 
 rm -f "$HOME_DIR/layouts/main-zed.json"
-rm -rf "$HOME_DIR/mods/zed-tabs" "$HOME_DIR/mods/zed-new-menu"
+rm -rf "${HOME_DIR:?}/mods/zed-tabs" "${HOME_DIR:?}/mods/zed-new-menu"
 echo "herdr-zed: removed."

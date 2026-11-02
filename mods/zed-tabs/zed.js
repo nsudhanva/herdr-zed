@@ -1,4 +1,4 @@
-// Opens a Herdr space in Zed on this computer.
+// Opens a Herdr space in Zed on this computer. Used by the tab bar's Zed button.
 //
 // Local space:  zed <repo root>
 // Remote space: zed ssh://<ssh target><repo root>   (a Zed remote project)
